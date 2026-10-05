@@ -7,6 +7,7 @@ import { t } from '../i18n';
 import { alternatesFor, pathFor, type PageRef } from '../i18n/routes';
 import { abs, ogImageFor, serializeJsonLd } from '../lib/seo';
 import { profile } from '../data/profile';
+import { CF_BEACON_SRC, CF_WEB_ANALYTICS_TOKEN } from '../lib/analytics';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import MotionToggle from '../components/MotionToggle.astro';
@@ -121,6 +122,16 @@ const ogImage = ogImageFor(page, locale);
     <script>
       import '../scripts/main';
     </script>
+    {
+      import.meta.env.PROD && (
+        <script
+          is:inline
+          type="module"
+          src={CF_BEACON_SRC}
+          data-cf-beacon={JSON.stringify({ token: CF_WEB_ANALYTICS_TOKEN })}
+        />
+      )
+    }
   </body>
 </html>
 
