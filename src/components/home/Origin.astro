@@ -1,0 +1,151 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+<section class="origin" id="origin" data-formation="wave" data-chapter="ORG" data-chapter-label={d.origin.kicker} aria-labelledby="origin-title">
+  <div class="wrap origin__inner">
+    <p class="kicker mono" data-reveal>{d.origin.kicker}</p>
+    <h2 id="origin-title" class="h2 origin__title" data-split>{d.origin.title}</h2>
+    <div class="origin__body">
+      {
+        d.origin.body.map((p, i) => (
+          <p data-reveal data-d={String(120 + i * 120)} class:list={[i === 0 ? 'lead' : 'muted']}>
+            {p}
+          </p>
+        ))
+      }
+    </div>
+    <ul class="stats" role="list">
+      {
+        d.origin.stats.map((s, i) => (
+          <li data-reveal data-d={String(i * 90)}>
+            <span class="stats__value" data-count={s.value}>
+              {s.value}
+            </span>
+            <span class="stats__label mono">{s.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .origin {
+    position: relative;
+    padding-block: var(--section-y);
+    min-block-size: 110svh;
+    display: flex;
+    align-items: center;
+  }
+
+  .origin__inner {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(0.75rem, 0.4rem + 1.2vw, 1.5rem);
+    row-gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .origin__inner > * {
+    grid-column: 1 / span 7;
+  }
+
+  .origin__title {
+    max-inline-size: 13ch;
+  }
+
+  .origin__body {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 46ch;
+  }
+
+  .origin__body .lead {
+    max-inline-size: none;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    margin-block-start: clamp(1rem, 3vw, 2.5rem);
+    border-block-start: 1px solid var(--line);
+  }
+
+  .stats li {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: 1.25rem 1rem 0 0;
+  }
+
+  .stats li + li {
+    padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .stats__value {
+    font-size: clamp(2.5rem, 1.6rem + 3.4vw, 4.75rem);
+    font-stretch: 112%;
+    font-weight: 560;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stats__label {
+    color: var(--ink-2);
+    text-transform: none;
+    max-inline-size: 16ch;
+  }
+
+  @media (max-width: 1099px) {
+    .origin__inner > * {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .origin {
+      display: block;
+      padding-block: 70svh 4rem;
+    }
+
+    .origin__inner {
+      position: relative;
+      padding-block-start: 2.5rem;
+    }
+
+    .origin__inner::before {
+      content: '';
+      position: absolute;
+      inset: -6rem 0 0;
+      z-index: -1;
+      background: linear-gradient(to bottom, transparent, rgb(10 11 13 / 0.9) 6rem, rgb(10 11 13 / 0.94));
+      pointer-events: none;
+    }
+  }
+
+  @media (max-width: 699px) {
+
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stats li:nth-child(3) {
+      padding-inline-start: 0;
+      border-inline-start: 0;
+    }
+
+    .stats li:nth-child(n + 3) {
+      padding-block-start: 1.5rem;
+    }
+  }
+</style>

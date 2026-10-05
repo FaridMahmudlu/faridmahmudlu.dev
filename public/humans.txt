@@ -1,0 +1,13 @@
+/* TEAM */
+Design, code, copy: Farid Mahmudlu
+Role: Full-stack & AI software developer
+Location: Budapest, Hungary
+GitHub: https://github.com/FaridMahmudlu
+LinkedIn: https://www.linkedin.com/in/farid-mahmudluu/
+
+/* SITE */
+Languages: English, Azerbaijani, Hungarian
+Standards: HTML, CSS, TypeScript, WebGL2, WCAG 2.2 AA
+Components: Astro, Lenis
+Fonts: Archivo (Omnibus-Type), Martian Mono (Evil Martians)
+Hosting: Cloudflare

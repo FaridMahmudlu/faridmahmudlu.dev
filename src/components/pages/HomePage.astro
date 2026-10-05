@@ -1,0 +1,63 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n';
+import type { Layer as LayerKey } from '../../data/work';
+import { homeGraph } from '../../lib/seo';
+import { BUILD_DATE } from '../../lib/build';
+import Base from '../../layouts/Base.astro';
+import Hud, { type RailStop } from '../Hud.astro';
+import Hero from '../home/Hero.astro';
+import Origin from '../home/Origin.astro';
+import Layer from '../home/Layer.astro';
+import WorkIndex from '../home/WorkIndex.astro';
+import Toolkit from '../home/Toolkit.astro';
+import Log from '../home/Log.astro';
+import Faq from '../home/Faq.astro';
+import Contact from '../home/Contact.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+const LAYERS: LayerKey[] = ['data', 'auth', 'backend', 'interface', 'ai', 'production'];
+
+const stops: RailStop[] = [
+  { id: 'hero', index: 'SIG', label: d.hud.signal },
+  { id: 'origin', index: 'ORG', label: d.origin.kicker },
+  ...LAYERS.map((k) => ({ id: `layer-${k}`, index: d.layers[k].index, label: d.layers[k].name })),
+  { id: 'work', index: 'WRK', label: d.work.kicker },
+  { id: 'log', index: 'LOG', label: d.log.kicker },
+  { id: 'contact', index: 'END', label: d.contact.kicker },
+];
+
+const jsonLd = homeGraph({
+  locale,
+  title: d.meta.homeTitle,
+  description: d.meta.homeDescription,
+  modified: BUILD_DATE,
+});
+---
+
+<Base
+  locale={locale}
+  page={{ type: 'home' }}
+  title={d.meta.homeTitle}
+  description={d.meta.homeDescription}
+  jsonLd={jsonLd}
+  ogType="profile"
+  signal="core"
+  bodyClass="is-home"
+>
+  <Hero locale={locale} />
+  <Origin locale={locale} />
+  <div id="process" class="process">
+    {LAYERS.map((k) => <Layer layer={k} data={d.layers[k]} />)}
+  </div>
+  <WorkIndex locale={locale} />
+  <Toolkit locale={locale} />
+  <Log locale={locale} />
+  <Faq locale={locale} />
+  <Contact locale={locale} />
+  <Hud slot="after" locale={locale} stops={stops} />
+</Base>

@@ -1,0 +1,9 @@
+Copyright (c) 2026 Farid Mahmudlu. All rights reserved.
+
+The source code, design, texts and visuals in this repository are published for transparency
+and review only. No licence is granted to copy, modify, distribute or reuse them, in whole or
+in part, without prior written permission. See https://faridmahmudlu.dev/terms/.
+
+Third-party components keep their own licences (for example Astro and Lenis under MIT, and the
+Archivo and Martian Mono fonts under the SIL Open Font License 1.1); they are installed as
+dependencies and are not part of this copyright claim.

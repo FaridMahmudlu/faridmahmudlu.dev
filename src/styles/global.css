@@ -1,0 +1,481 @@
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource-variable/martian-mono/wdth.css';
+
+/* ───────────────────────── Tokens ───────────────────────── */
+:root {
+  color-scheme: dark;
+
+  --bg: #0a0b0d;
+  --bg-raise: #111216;
+  --bg-sunk: #070809;
+  --ink: #ece9e2;
+  --ink-2: #a3a09a;
+  --ink-3: #6b6964;
+  --line: rgb(236 233 226 / 0.1);
+  --line-2: rgb(236 233 226 / 0.2);
+  --signal: #ff5a1f;
+  --signal-soft: rgb(255 90 31 / 0.14);
+
+  --font-sans: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Martian Mono Variable', 'Martian Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Fluid type scale (360px → 1600px) */
+  --fs-micro: clamp(0.625rem, 0.6rem + 0.1vw, 0.6875rem);
+  --fs-mono: clamp(0.6875rem, 0.66rem + 0.12vw, 0.75rem);
+  --fs-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --fs-body: clamp(1rem, 0.96rem + 0.18vw, 1.125rem);
+  --fs-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.4375rem);
+  --fs-h3: clamp(1.25rem, 1.08rem + 0.75vw, 1.75rem);
+  --fs-h2: clamp(2.125rem, 1.35rem + 3.6vw, 5rem);
+  --fs-display: clamp(3.4rem, 0.9rem + 11.2vw, 13rem);
+
+  --gutter: clamp(1.25rem, 0.4rem + 3.8vw, 4.5rem);
+  --frame: clamp(0.75rem, 0.5rem + 1vw, 1.375rem);
+  --section-y: clamp(6rem, 4rem + 9vw, 12rem);
+  --header-h: 4.25rem;
+  --radius: 2px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --dur: 0.9s;
+}
+
+/* ───────────────────────── Lenis (smooth wheel) ───────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ───────────────────────── Reset ───────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  hanging-punctuation: first last;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.lenis) {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-stretch: 100%;
+  font-weight: 400;
+  line-height: 1.6;
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+li,
+dd,
+dt {
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--signal);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+
+/* ───────────────────────── Utilities ───────────────────────── */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--frame);
+  left: var(--frame);
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--signal);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transform: translateY(-200%);
+  transition: transform 0.3s var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-stretch: 87.5%;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  color: var(--ink-2);
+}
+
+.kicker::before {
+  content: '';
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  background: var(--signal);
+  flex: none;
+}
+
+.kicker b {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.wrap {
+  inline-size: 100%;
+  padding-inline: var(--gutter);
+  margin-inline: auto;
+  max-inline-size: 1680px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(0.75rem, 0.4rem + 1.2vw, 1.5rem);
+}
+
+.h2 {
+  font-size: var(--fs-h2);
+  font-stretch: 112%;
+  font-weight: 640;
+  letter-spacing: -0.035em;
+  line-height: 0.96;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+  color: var(--ink);
+  max-inline-size: 38ch;
+  font-weight: 380;
+}
+
+.muted {
+  color: var(--ink-2);
+}
+
+.link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition:
+    background-size 0.5s var(--ease-out),
+    color 0.2s;
+}
+
+.link:hover {
+  color: var(--signal);
+}
+
+.arrow {
+  display: inline-block;
+  inline-size: 0.8em;
+  block-size: 0.8em;
+  flex: none;
+  transition: transform 0.45s var(--ease-out);
+}
+
+a:hover > .arrow,
+a:focus-visible > .arrow {
+  transform: translate(0.15em, -0.15em);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-stretch: 87.5%;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.3em 0.6em 0.25em;
+  border: 1px solid var(--line-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+/* ───────────────────────── Long-form prose (Markdown) ───────────────────────── */
+.prose {
+  max-inline-size: 70ch;
+  color: var(--ink-2);
+}
+
+.prose > * + * {
+  margin-block-start: 1.1em;
+}
+
+.prose h2 {
+  margin-block: 2.6em 0.9em;
+  padding-block-start: 1.1rem;
+  border-block-start: 1px solid var(--line-2);
+  color: var(--ink);
+  font-size: var(--fs-h3);
+  font-stretch: 108%;
+  font-weight: 580;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  scroll-margin-top: calc(var(--header-h) + 1.5rem);
+}
+
+.prose h2:first-child {
+  margin-block-start: 0;
+}
+
+.prose h3 {
+  margin-block: 2em 0.6em;
+  color: var(--ink);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.prose a {
+  color: var(--ink);
+  background-image: linear-gradient(var(--signal), var(--signal));
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: color 0.2s;
+}
+
+.prose a:hover {
+  color: var(--signal);
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.25rem;
+  display: grid;
+  gap: 0.45em;
+}
+
+.prose li::marker {
+  color: var(--signal);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  background: var(--bg-raise);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.prose blockquote {
+  padding-inline-start: 1.25rem;
+  border-inline-start: 2px solid var(--signal);
+  color: var(--ink);
+}
+
+.prose table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+  display: block;
+  overflow-x: auto;
+}
+
+.prose th,
+.prose td {
+  text-align: start;
+  vertical-align: top;
+  padding: 0.7rem 1rem 0.7rem 0;
+  border-block-end: 1px solid var(--line);
+}
+
+.prose th {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-block-end-color: var(--line-2);
+}
+
+.prose hr {
+  border: 0;
+  border-block-start: 1px solid var(--line);
+  margin-block: 2.5em;
+}
+
+/* ───────────────────────── Reveal system ─────────────────────────
+   Content is visible by default (no-JS, crawlers, LCP). JS only "arms"
+   elements that start below the fold, so nothing visible ever flashes. */
+[data-reveal].is-armed {
+  opacity: 0;
+  transform: translate3d(0, 2.25rem, 0);
+  transition:
+    opacity 1s var(--ease-out),
+    transform 1.2s var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 1ms);
+}
+
+[data-reveal].is-armed.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+[data-split] .w {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding-block-end: 0.1em;
+  margin-block-end: -0.1em;
+}
+
+[data-split] .w > span {
+  display: inline-block;
+}
+
+[data-split].is-armed .w > span {
+  transform: translate3d(0, 108%, 0);
+  transition: transform 1.25s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 45ms + var(--d, 0) * 1ms);
+}
+
+[data-split].is-armed.is-in .w > span {
+  transform: none;
+}
+
+[data-line].is-armed {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.4s var(--ease-in-out);
+}
+
+[data-line].is-armed.is-in {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

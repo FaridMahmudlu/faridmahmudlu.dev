@@ -1,0 +1,200 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n';
+import { profile } from '../../data/profile';
+import Icon from '../Icon.astro';
+import EmailLink from '../EmailLink.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+<section class="contact" id="contact" data-formation="point" data-chapter="END" data-chapter-label={d.contact.kicker} aria-labelledby="contact-title">
+  <div class="wrap contact__inner">
+    <p class="kicker mono" data-reveal>{d.contact.kicker}</p>
+    <h2 id="contact-title" class="contact__title" data-split>{d.contact.title}</h2>
+    <p class="lead muted contact__lead" data-reveal data-d="120">{d.contact.lead}</p>
+
+    <div class="contact__mail" data-reveal data-d="200">
+      <span class="mono muted">{d.contact.emailLabel}</span>
+      <EmailLink class="contact__email" />
+      <button class="contact__copy mono" type="button" data-copy-email data-label-done={d.contact.copied} hidden>
+        <Icon name="copy" />
+        <span data-copy-label>{d.contact.copy}</span>
+      </button>
+      <span class="visually-hidden" role="status" aria-live="polite" data-copy-status></span>
+    </div>
+
+    <ul class="contact__links" role="list" data-reveal data-d="260">
+      <li>
+        <a href={profile.links.linkedin} target="_blank" rel="me noopener" class="contact__link">
+          <Icon name="linkedin" class="contact__icon" />
+          <span>LinkedIn</span>
+          <span class="mono muted">/in/{profile.linkedinHandle}</span>
+          <span class="visually-hidden">{d.a11y.external}</span>
+        </a>
+      </li>
+      <li>
+        <a href={profile.links.github} target="_blank" rel="me noopener" class="contact__link">
+          <Icon name="github" class="contact__icon" />
+          <span>GitHub</span>
+          <span class="mono muted">@{profile.githubHandle}</span>
+          <span class="visually-hidden">{d.a11y.external}</span>
+        </a>
+      </li>
+      <li>
+        <a href={profile.cv} download class="contact__link" type="application/pdf">
+          <Icon name="download" class="contact__icon" />
+          <span>{d.contact.cv}</span>
+          <span class="mono muted">PDF</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    min-block-size: 100svh;
+    display: flex;
+    align-items: center;
+    padding-block: var(--section-y);
+  }
+
+  .contact__inner {
+    display: grid;
+    gap: clamp(1.25rem, 2.6vw, 2.25rem);
+  }
+
+  .contact__title {
+    font-size: clamp(3rem, 1rem + 8.5vw, 10rem);
+    font-stretch: 112%;
+    font-weight: 620;
+    letter-spacing: -0.05em;
+    line-height: 0.88;
+    max-inline-size: 9ch;
+  }
+
+  .contact__lead {
+    max-inline-size: 44ch;
+  }
+
+  .contact__mail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    padding-block: 1.5rem;
+    margin-block-start: 1rem;
+    border-block: 1px solid var(--line-2);
+  }
+
+  .contact__mail :global(.contact__email) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: clamp(1.15rem, 0.7rem + 2.1vw, 2.5rem);
+    font-stretch: 104%;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    word-break: break-all;
+    transition: color 0.2s;
+  }
+
+  .contact__mail :global(.contact__email:hover) {
+    color: var(--signal);
+  }
+
+  .contact__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.5rem;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--line-2);
+    color: var(--ink-2);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .contact__copy:hover {
+    color: var(--ink);
+    border-color: var(--ink-2);
+  }
+
+  .contact__copy[hidden] {
+    display: none;
+  }
+
+  .contact__links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-block-end: 1px solid var(--line);
+  }
+
+  .contact__link {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.25rem 0.85rem;
+    padding: 1.25rem 1rem 1.25rem 0;
+    transition: color 0.2s;
+  }
+
+  .contact__links li + li .contact__link {
+    padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .contact__link .mono {
+    grid-column: 2;
+    text-transform: none;
+  }
+
+  .contact__link:hover {
+    color: var(--signal);
+  }
+
+  :global(.contact__icon) {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    grid-row: span 2;
+  }
+
+  @media (max-width: 899px) {
+    .contact {
+      display: block;
+      padding-block: 62svh 4rem;
+    }
+
+    .contact__inner {
+      position: relative;
+      padding-block-start: 2rem;
+    }
+
+    .contact__inner::before {
+      content: '';
+      position: absolute;
+      inset: -6rem 0 0;
+      z-index: -1;
+      background: linear-gradient(to bottom, transparent, rgb(10 11 13 / 0.9) 6rem, rgb(10 11 13 / 0.94));
+      pointer-events: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contact__links {
+      grid-template-columns: 1fr;
+    }
+
+    .contact__links li + li .contact__link {
+      padding-inline-start: 0;
+      border-inline-start: 0;
+      border-block-start: 1px solid var(--line);
+    }
+  }
+</style>

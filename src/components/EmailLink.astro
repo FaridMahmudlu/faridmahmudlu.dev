@@ -1,0 +1,21 @@
+---
+import { emailAddress, profile } from '../data/profile';
+import Icon from './Icon.astro';
+
+interface Props {
+  class?: string;
+  icon?: boolean;
+}
+const { class: className, icon = true } = Astro.props;
+
+// The address never appears verbatim in the HTML: it ships reversed and
+// base64-encoded and is reassembled by src/scripts/main.ts. Without JS,
+// readers see a human-readable form that naive harvesters will not match.
+const encoded = Buffer.from([...emailAddress()].reverse().join(''), 'utf8').toString('base64');
+const readable = `${profile.email.user} [at] ${profile.email.domain.replace('.', ' [dot] ')}`;
+---
+
+<a class={className} data-email={encoded} translate="no">
+  <span data-email-text>{readable}</span>
+  {icon && <Icon name="arrow-up-right" />}
+</a>

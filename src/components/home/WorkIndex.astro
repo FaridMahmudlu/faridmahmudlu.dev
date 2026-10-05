@@ -1,0 +1,270 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t, formatPeriod } from '../../i18n';
+import { pathFor } from '../../i18n/routes';
+import { additionalWork, products, projects, roleKey, type WorkItem } from '../../data/work';
+import Icon from '../Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+
+const groups: { label: string; items: WorkItem[] }[] = [
+  { label: d.work.productsLabel, items: products },
+  { label: d.work.projectsLabel, items: projects },
+];
+---
+
+<section class="work" id="work" data-formation="field" data-chapter="WRK" data-chapter-label={d.work.kicker} aria-labelledby="work-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="kicker mono" data-reveal>{d.work.kicker}</p>
+      <h2 id="work-title" class="h2" data-split>{d.work.title}</h2>
+      <p class="lead muted" data-reveal data-d="120">{d.work.lead}</p>
+    </header>
+
+    {
+      groups.map((group, g) => (
+        <div class="work__group">
+          <h3 class="work__label mono" data-reveal>
+            <span>{group.label}</span>
+            <span aria-hidden="true">{String(group.items.length).padStart(2, '0')}</span>
+          </h3>
+          <ol class="work-list" role="list">
+            {group.items.map((item, i) => (
+              <li data-reveal data-d={String(i * 70)}>
+                <a class="work-row" href={pathFor({ type: 'work', slug: item.slug }, locale)}>
+                  <span class="work-row__i mono" aria-hidden="true">
+                    {g === 0 ? 'P' : 'X'}
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span class="work-row__name">{item.name}</span>
+                  <span class="work-row__summary">{d.work.summaries[item.slug]}</span>
+                  <span class="work-row__meta mono">
+                    <span>{d.work.roles[roleKey(item)]}</span>
+                    <span>{formatPeriod(item.start, item.end, locale)}</span>
+                  </span>
+                  <span class="work-row__go mono">
+                    <span class="visually-hidden">{d.work.caseStudy}: </span>
+                    <span aria-hidden="true">{d.work.caseStudy}</span>
+                    <Icon name="arrow-right" />
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))
+    }
+
+    <div class="work__group">
+      <h3 class="work__label mono" data-reveal>
+        <span>{d.work.moreLabel}</span>
+        <span aria-hidden="true">{String(additionalWork.length).padStart(2, '0')}</span>
+      </h3>
+      <ul class="more" role="list">
+        {
+          additionalWork.map((item, i) => (
+            <li class="more__item" data-reveal data-d={String(i * 60)}>
+              <a href={item.repo} target="_blank" rel="noopener" class="more__link">
+                <span class="more__name">{item.name}</span>
+                <Icon name="arrow-up-right" />
+                <span class="visually-hidden">{d.a11y.external}</span>
+              </a>
+              <p class="more__text">{d.work.additional[item.key]}</p>
+              <p class="more__stack mono">{item.stack.join(' · ')}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .work {
+    position: relative;
+    padding-block: var(--section-y);
+  }
+
+  .section-head {
+    display: grid;
+    gap: clamp(1.25rem, 2.4vw, 2rem);
+    max-inline-size: 60rem;
+    margin-block-end: clamp(3rem, 7vw, 6rem);
+  }
+
+  .work__group + .work__group {
+    margin-block-start: clamp(3.5rem, 7vw, 6rem);
+  }
+
+  .work__label {
+    display: flex;
+    justify-content: space-between;
+    padding-block-end: 0.9rem;
+    color: var(--ink-2);
+    font-weight: 400;
+    border-block-end: 1px solid var(--line-2);
+  }
+
+  .work-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 0.5rem 1.5rem;
+    padding-block: clamp(1.25rem, 2.2vw, 1.9rem);
+    border-block-end: 1px solid var(--line);
+    isolation: isolate;
+  }
+
+  .work-row::before {
+    content: '';
+    position: absolute;
+    inset: -1px 0 -1px;
+    z-index: -1;
+    background: linear-gradient(90deg, var(--signal-soft), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out);
+  }
+
+  .work-row::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px;
+    block-size: 1px;
+    background: var(--signal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease-out);
+  }
+
+  .work-row:hover::before,
+  .work-row:focus-visible::before {
+    opacity: 1;
+  }
+
+  .work-row:hover::after,
+  .work-row:focus-visible::after {
+    transform: none;
+  }
+
+  .work-row__i {
+    color: var(--ink-3);
+  }
+
+  .work-row__name {
+    font-size: clamp(1.75rem, 1.1rem + 2.4vw, 3.25rem);
+    font-stretch: 112%;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    transition: transform 0.6s var(--ease-out), color 0.3s;
+  }
+
+  .work-row:hover .work-row__name {
+    transform: translateX(0.4rem);
+  }
+
+  .work-row__summary {
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+    max-inline-size: 38ch;
+  }
+
+  .work-row__meta {
+    display: grid;
+    gap: 0.2rem;
+    color: var(--ink-3);
+    text-transform: none;
+  }
+
+  .work-row__meta span:first-child {
+    color: var(--ink-2);
+  }
+
+  .work-row__go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink-2);
+    transition: color 0.2s;
+  }
+
+  .work-row:hover .work-row__go {
+    color: var(--signal);
+  }
+
+  .work-row:hover .arrow {
+    transform: translateX(0.25rem);
+  }
+
+  .more {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: 0;
+  }
+
+  .more__item {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: 1.4rem 1.25rem 1.4rem 0;
+    border-block-end: 1px solid var(--line);
+  }
+
+  .more__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-h3);
+    font-stretch: 108%;
+    font-weight: 560;
+    letter-spacing: -0.02em;
+    inline-size: fit-content;
+    transition: color 0.2s;
+  }
+
+  .more__link:hover {
+    color: var(--signal);
+  }
+
+  .more__text {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .more__stack {
+    color: var(--ink-3);
+    text-transform: none;
+  }
+
+  @media (max-width: 1099px) {
+    .work-row {
+      grid-template-columns: 3rem minmax(0, 1fr) auto;
+    }
+
+    .work-row__summary,
+    .work-row__meta {
+      grid-column: 2 / 3;
+    }
+
+    .work-row__go {
+      grid-column: 3;
+      grid-row: 1;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .work-row {
+      grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+      column-gap: 0.75rem;
+    }
+
+    .work-row__go > span[aria-hidden] {
+      display: none;
+    }
+  }
+</style>

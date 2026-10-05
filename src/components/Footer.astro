@@ -1,0 +1,151 @@
+---
+import type { Locale } from '../i18n/config';
+import { t } from '../i18n';
+import { LEGAL_PAGES, pathFor } from '../i18n/routes';
+import { profile } from '../data/profile';
+import Icon from './Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+const year = new Date().getUTCFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__id">
+        <p class="site-footer__name">{profile.name}</p>
+        <p class="mono muted">{d.meta.jobTitle} · {profile.location.city}, {profile.location.country}</p>
+        <p class="mono site-footer__note">{d.footer.privacyNote}</p>
+      </div>
+
+      <nav class="site-footer__col" aria-labelledby="footer-legal">
+        <h2 id="footer-legal" class="mono muted">{d.footer.legalTitle}</h2>
+        <ul role="list">
+          {
+            LEGAL_PAGES.map((id) => (
+              <li>
+                <a class="link-quiet" href={pathFor({ type: 'legal', id }, locale)}>
+                  {d.footer.legal[id]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="site-footer__col">
+        <h2 class="mono muted">{d.contact.elsewhere}</h2>
+        <ul role="list">
+          <li>
+            <a class="link-quiet" href={profile.links.github} rel="me noopener" target="_blank">
+              GitHub <Icon name="arrow-up-right" /><span class="visually-hidden">{d.a11y.external}</span>
+            </a>
+          </li>
+          <li>
+            <a class="link-quiet" href={profile.links.linkedin} rel="me noopener" target="_blank">
+              LinkedIn <Icon name="arrow-up-right" /><span class="visually-hidden">{d.a11y.external}</span>
+            </a>
+          </li>
+          <li>
+            <a class="link-quiet" href="#top" data-to-top>
+              {d.footer.backToTop}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__base mono">
+      <p>© {year} {profile.name}. {d.footer.rights}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    z-index: 2;
+    padding-block: clamp(3.5rem, 7vw, 6rem) calc(var(--frame) + env(safe-area-inset-bottom));
+    border-block-start: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+    gap: 2.5rem var(--gutter);
+  }
+
+  .site-footer__name {
+    font-size: var(--fs-h3);
+    font-stretch: 112%;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-block-end: 0.75rem;
+  }
+
+  .site-footer__note {
+    margin-block-start: 1.5rem;
+    color: var(--ink);
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .site-footer__note::before {
+    content: '';
+    inline-size: 0.45rem;
+    block-size: 0.45rem;
+    background: var(--signal);
+    flex: none;
+  }
+
+  .site-footer__col h2 {
+    font-weight: 400;
+    margin-block-end: 1rem;
+  }
+
+  .site-footer__col ul {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .link-quiet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-block-size: 2.25rem;
+    color: var(--ink);
+    transition: color 0.2s;
+  }
+
+  .link-quiet:hover {
+    color: var(--signal);
+  }
+
+  .site-footer__base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    margin-block-start: clamp(3rem, 6vw, 5rem);
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--line);
+    color: var(--ink-2);
+    text-transform: none;
+  }
+
+  @media (max-width: 767px) {
+    .site-footer__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .site-footer__id {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

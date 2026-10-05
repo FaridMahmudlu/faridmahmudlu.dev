@@ -1,0 +1,237 @@
+---
+import type { Dictionary } from '../../i18n';
+import type { Layer as LayerKey } from '../../data/work';
+
+interface Props {
+  layer: LayerKey;
+  data: Dictionary['layers'][LayerKey];
+}
+const { layer, data } = Astro.props;
+const id = `layer-${layer}`;
+---
+
+<section class="chapter" id={id} data-formation={layer} data-chapter={data.index} data-chapter-label={data.name} aria-labelledby={`${id}-title`}>
+  <div class="chapter__inner wrap">
+    <div class="chapter__col">
+      <p class="chapter__kicker mono" data-reveal>
+        <span class="chapter__index">{data.index}</span>
+        <span class="chapter__rule" aria-hidden="true" data-line></span>
+        <span>{data.name}</span>
+      </p>
+      <h2 id={`${id}-title`} class="h2 chapter__title" data-split>{data.title}</h2>
+      <p class="lead chapter__lead" data-reveal data-d="150">{data.lead}</p>
+
+      <ol class="evidence" role="list">
+        {
+          data.evidence.map((e, i) => (
+            <li class="evidence__item" data-reveal data-d={String(200 + i * 110)}>
+              <span class="evidence__project mono">
+                <span class="evidence__n" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {e.project}
+              </span>
+              <p class="evidence__text">{e.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="spec mono" data-reveal data-d="250">
+      <p class="spec__head">
+        <span>{data.index} / {data.name}</span>
+        <span class="spec__live" aria-hidden="true">spec</span>
+      </p>
+      <dl>
+        {
+          data.spec.map(([k, v]) => (
+            <div class="spec__row">
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .chapter {
+    position: relative;
+    min-block-size: 135svh;
+    display: flex;
+    align-items: center;
+    padding-block: clamp(5rem, 12vh, 9rem);
+  }
+
+  .chapter__inner {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(0.75rem, 0.4rem + 1.2vw, 1.5rem);
+    align-items: end;
+  }
+
+  .chapter__col {
+    grid-column: 1 / span 6;
+    display: grid;
+    gap: clamp(1.25rem, 2.4vw, 2rem);
+  }
+
+  .chapter__kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  .chapter__index {
+    color: var(--signal);
+    font-weight: 500;
+  }
+
+  .chapter__rule {
+    inline-size: 3rem;
+    block-size: 1px;
+    background: var(--line-2);
+  }
+
+  .chapter__title {
+    max-inline-size: 12ch;
+  }
+
+  .chapter__lead {
+    max-inline-size: 40ch;
+    color: var(--ink-2);
+  }
+
+  .evidence {
+    display: grid;
+    margin-block-start: 0.5rem;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .evidence__item {
+    display: grid;
+    grid-template-columns: minmax(8.5rem, 0.32fr) 1fr;
+    gap: 0.4rem 1.5rem;
+    padding-block: 1.05rem;
+    border-block-end: 1px solid var(--line);
+  }
+
+  .evidence__project {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--ink);
+    padding-block-start: 0.25em;
+  }
+
+  .evidence__n {
+    color: var(--ink-3);
+  }
+
+  .evidence__text {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    line-height: 1.6;
+    max-inline-size: 52ch;
+  }
+
+  .spec {
+    grid-column: 9 / span 4;
+    align-self: end;
+    padding: 1rem 1.1rem 0.4rem;
+    border: 1px solid var(--line-2);
+    background: rgb(10 11 13 / 0.84);
+  }
+
+  .spec__head {
+    display: flex;
+    justify-content: space-between;
+    padding-block-end: 0.75rem;
+    margin-block-end: 0.25rem;
+    border-block-end: 1px solid var(--line-2);
+    color: var(--ink);
+  }
+
+  .spec__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--signal);
+  }
+
+  .spec__live::before {
+    content: '';
+    inline-size: 0.4rem;
+    block-size: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .spec__row {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 0.75rem;
+    padding-block: 0.6rem;
+    text-transform: none;
+  }
+
+  .spec__row + .spec__row {
+    border-block-start: 1px dashed var(--line);
+  }
+
+  .spec dt {
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+
+  .spec dd {
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 1099px) {
+    .chapter__col {
+      grid-column: 1 / span 8;
+    }
+
+    .spec {
+      grid-column: 1 / span 7;
+      margin-block-start: 2.5rem;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .chapter {
+      display: block;
+      min-block-size: 0;
+      padding-block: 70svh 4rem;
+    }
+
+    .chapter__inner {
+      position: relative;
+      padding-block-start: 2.5rem;
+    }
+
+    .chapter__inner::before {
+      content: '';
+      position: absolute;
+      inset: -6rem 0 0;
+      z-index: -1;
+      background: linear-gradient(to bottom, transparent, rgb(10 11 13 / 0.9) 6rem, rgb(10 11 13 / 0.94));
+      pointer-events: none;
+    }
+
+    .chapter__col,
+    .spec {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .evidence__item {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

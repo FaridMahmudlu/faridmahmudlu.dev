@@ -1,0 +1,62 @@
+---
+import { LOCALES, LOCALE_META, type Locale } from '../i18n/config';
+import { t } from '../i18n';
+import { pathFor, type PageRef } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  page: PageRef;
+  class?: string;
+}
+const { locale, page, class: className } = Astro.props;
+const d = t(locale);
+---
+
+<nav class:list={['lang', className]} aria-label={d.a11y.language}>
+  <ul role="list">
+    {
+      LOCALES.map((l) => (
+        <li>
+          <a
+            href={pathFor(page, l)}
+            hreflang={LOCALE_META[l].tag}
+            lang={LOCALE_META[l].tag}
+            aria-current={l === locale ? 'true' : undefined}
+            class="mono"
+          >
+            {LOCALE_META[l].short}
+            <span class="visually-hidden"> — {LOCALE_META[l].name}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .lang ul {
+    display: flex;
+    gap: 0.15rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .lang a {
+    display: grid;
+    place-items: center;
+    min-inline-size: 2.25rem;
+    min-block-size: 2.25rem;
+    padding-inline: 0.35rem;
+    color: var(--ink-3);
+    transition: color 0.2s;
+  }
+
+  .lang a:hover {
+    color: var(--ink);
+  }
+
+  .lang a[aria-current='true'] {
+    color: var(--ink);
+    box-shadow: inset 0 -1px 0 var(--signal);
+  }
+</style>

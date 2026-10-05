@@ -1,0 +1,238 @@
+---
+import { getEntry, render } from 'astro:content';
+import type { Locale } from '../../i18n/config';
+import { t, formatDate } from '../../i18n';
+import { homePath, LEGAL_PAGES, pathFor, type LegalId } from '../../i18n/routes';
+import { profile } from '../../data/profile';
+import { legalGraph } from '../../lib/seo';
+import Base from '../../layouts/Base.astro';
+import Icon from '../Icon.astro';
+import EmailLink from '../EmailLink.astro';
+
+interface Props {
+  locale: Locale;
+  id: LegalId;
+}
+const { locale, id } = Astro.props;
+const d = t(locale);
+const entry = await getEntry('legal', `${locale}/${id}`);
+if (!entry) throw new Error(`Missing legal content for "${locale}/${id}"`);
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2);
+const page = { type: 'legal', id } as const;
+const title = `${entry.data.title}${d.meta.titleSuffix}`;
+const jsonLd = legalGraph({ page, locale, title, description: entry.data.description, modified: entry.data.updated });
+---
+
+<Base locale={locale} page={page} title={title} description={entry.data.description} jsonLd={jsonLd} bodyClass="is-legal">
+  <article class="legal wrap" aria-labelledby="legal-title">
+    <header class="legal__head">
+      <nav class="crumbs mono" aria-label={d.a11y.breadcrumb}>
+        <ol role="list">
+          <li><a href={homePath(locale)}>{profile.name}</a></li>
+          <li><span aria-current="page">{entry.data.title}</span></li>
+        </ol>
+      </nav>
+      <p class="kicker mono"><b>{d.footer.legalTitle}</b></p>
+      <h1 id="legal-title" class="legal__title">{entry.data.title}</h1>
+      <p class="mono muted">
+        {d.legal.updated}: <time datetime={entry.data.updated}>{formatDate(entry.data.updated, locale)}</time>
+      </p>
+    </header>
+
+    <div class="legal__grid">
+      <aside class="legal__aside">
+        {
+          toc.length > 0 && (
+            <nav aria-labelledby="toc-title" class="legal__toc">
+              <h2 id="toc-title" class="mono muted">
+                {d.legal.toc}
+              </h2>
+              <ol role="list">
+                {toc.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
+        <nav aria-label={d.footer.legalTitle} class="legal__others">
+          <ul role="list">
+            {
+              LEGAL_PAGES.filter((p) => p !== id).map((p) => (
+                <li>
+                  <a href={pathFor({ type: 'legal', id: p }, locale)} class="mono">
+                    {d.footer.legal[p]}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </aside>
+
+      <div class="prose legal__body">
+        <Content />
+        <address class="legal__contact">
+          <span class="mono muted">{d.contact.kicker}</span>
+          <span>{profile.name} · {d.hero.meta[0]?.[1]}</span>
+          <span><span class="muted">{d.contact.emailLabel}:</span> <EmailLink icon={false} /></span>
+        </address>
+        <p class="legal__back">
+          <a href={homePath(locale)} class="link mono">
+            <Icon name="arrow-right" class="arrow arrow--back" />
+            {d.legal.back}
+          </a>
+        </p>
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .legal {
+    padding-block: calc(var(--header-h) + clamp(2.5rem, 6vw, 5rem)) var(--section-y);
+  }
+
+  .legal__head {
+    display: grid;
+    gap: 1.25rem;
+    padding-block-end: clamp(2rem, 5vw, 3.5rem);
+    margin-block-end: clamp(2rem, 5vw, 3.5rem);
+    border-block-end: 1px solid var(--line-2);
+  }
+
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: var(--ink-3);
+  }
+
+  .crumbs li + li::before {
+    content: '/';
+    margin-inline-end: 0.5rem;
+  }
+
+  .crumbs a {
+    color: var(--ink-2);
+  }
+
+  .crumbs a:hover {
+    color: var(--signal);
+  }
+
+  .crumbs [aria-current] {
+    color: var(--ink);
+  }
+
+  .legal__title {
+    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+    font-stretch: 112%;
+    font-weight: 620;
+    letter-spacing: -0.045em;
+    line-height: 0.92;
+  }
+
+  .legal__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(0.75rem, 0.4rem + 1.2vw, 1.5rem);
+  }
+
+  .legal__aside {
+    grid-column: 1 / span 3;
+    align-self: start;
+    position: sticky;
+    inset-block-start: calc(var(--header-h) + 1.5rem);
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .legal__toc h2 {
+    font-weight: 400;
+    margin-block-end: 0.85rem;
+  }
+
+  .legal__toc ol {
+    display: grid;
+    gap: 0.15rem;
+    counter-reset: toc;
+  }
+
+  .legal__toc a {
+    display: block;
+    padding-block: 0.35rem;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    line-height: 1.35;
+    transition: color 0.2s;
+  }
+
+  .legal__toc a:hover {
+    color: var(--signal);
+  }
+
+  .legal__others ul {
+    display: grid;
+    gap: 0.25rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .legal__others a {
+    display: inline-block;
+    padding-block: 0.3rem;
+    color: var(--ink-3);
+  }
+
+  .legal__others a:hover {
+    color: var(--ink);
+  }
+
+  .legal__body {
+    grid-column: 5 / span 8;
+  }
+
+  .legal__contact {
+    display: grid;
+    gap: 0.4rem;
+    margin-block-start: 3rem;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid var(--line-2);
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  .legal__back {
+    margin-block-start: 2rem;
+  }
+
+  .legal__back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  :global(.arrow--back) {
+    transform: rotate(180deg);
+  }
+
+  @media (max-width: 999px) {
+    .legal__aside {
+      position: static;
+      grid-column: 1 / -1;
+      margin-block-end: 2.5rem;
+    }
+
+    .legal__others {
+      display: none;
+    }
+
+    .legal__body {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

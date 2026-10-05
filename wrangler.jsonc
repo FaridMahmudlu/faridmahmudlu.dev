@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "faridmahmudlu-dev",
+  "compatibility_date": "2026-09-28",
+  // Static-only Worker: no server code, the whole site is served from ./dist.
+  // Response headers (CSP, HSTS, caching) are defined in public/_headers.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "force-trailing-slash"
+  },
+  // www.faridmahmudlu.dev is redirected to the apex with a Cloudflare
+  // Redirect Rule (see README), so only the apex is bound here.
+  "routes": [{ "pattern": "faridmahmudlu.dev", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": false }
+}

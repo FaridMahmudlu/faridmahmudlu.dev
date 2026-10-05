@@ -1,0 +1,179 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t, formatMonth } from '../../i18n';
+import { profile } from '../../data/profile';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+<section class="log" id="log" data-formation="field" data-chapter="LOG" data-chapter-label={d.log.kicker} aria-labelledby="log-title">
+  <div class="wrap log__inner">
+    <header class="log__head">
+      <p class="kicker mono" data-reveal>{d.log.kicker}</p>
+      <h2 id="log-title" class="h2" data-split>{d.log.title}</h2>
+    </header>
+
+    <ol class="timeline" role="list">
+      {
+        d.log.entries.map((entry, i) => (
+          <li class="timeline__item" data-reveal data-d={String(i * 60)}>
+            <time class="timeline__date mono" datetime={entry.date}>
+              {formatMonth(entry.date, locale)}
+            </time>
+            <p>{entry.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <aside class="log__side">
+      <section data-reveal aria-labelledby="edu-title">
+        <h3 id="edu-title" class="mono">{d.log.educationTitle}</h3>
+        <p>{d.log.education}</p>
+        <p class="mono muted">{d.log.educationPeriod}</p>
+      </section>
+      <section data-reveal data-d="80" aria-labelledby="cert-title">
+        <h3 id="cert-title" class="mono">{d.log.certTitle}</h3>
+        {
+          profile.certifications.map((c) => (
+            <p>
+              {c.name} <span class="muted">— {c.issuer}</span>
+              <span class="mono muted log__date">{formatMonth(c.date, locale)}</span>
+            </p>
+          ))
+        }
+      </section>
+      <section data-reveal data-d="160" aria-labelledby="lang-title">
+        <h3 id="lang-title" class="mono">{d.log.languagesTitle}</h3>
+        <dl class="langs">
+          {
+            profile.spokenLanguages.map((l) => (
+              <div>
+                <dt>{d.log.languageNames[l.code]}</dt>
+                <dd class="mono">{d.log.levels[l.level] ?? l.level}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .log {
+    position: relative;
+    padding-block: var(--section-y);
+  }
+
+  .log__inner {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(0.75rem, 0.4rem + 1.2vw, 1.5rem);
+    row-gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .log__head {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: clamp(1.25rem, 2.4vw, 2rem);
+  }
+
+  .timeline {
+    grid-column: 1 / span 7;
+    position: relative;
+    border-inline-start: 1px solid var(--line-2);
+  }
+
+  .timeline__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.4rem 1.5rem;
+    padding: 1.1rem 0 1.1rem 1.5rem;
+    border-block-end: 1px solid var(--line);
+  }
+
+  .timeline__item::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -0.25rem;
+    inset-block-start: 1.55rem;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    background: var(--bg);
+    border: 1px solid var(--ink-3);
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+
+  .timeline__item:first-child::before {
+    background: var(--signal);
+    border-color: var(--signal);
+  }
+
+  .timeline__item:hover::before {
+    border-color: var(--signal);
+  }
+
+  .timeline__date {
+    color: var(--ink-2);
+    padding-block-start: 0.3em;
+  }
+
+  .log__side {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 2.25rem;
+    align-content: start;
+  }
+
+  .log__side h3 {
+    color: var(--ink-2);
+    font-weight: 400;
+    padding-block-end: 0.75rem;
+    margin-block-end: 0.85rem;
+    border-block-end: 1px solid var(--line-2);
+  }
+
+  .log__side p + p {
+    margin-block-start: 0.35rem;
+  }
+
+  .log__date {
+    display: block;
+    margin-block-start: 0.35rem;
+  }
+
+  .langs div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.45rem;
+    border-block-end: 1px dashed var(--line);
+  }
+
+  .langs dd {
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 1099px) {
+    .timeline,
+    .log__side {
+      grid-column: 1 / -1;
+    }
+
+    .log__side {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    }
+  }
+
+  @media (max-width: 599px) {
+    .timeline__item {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

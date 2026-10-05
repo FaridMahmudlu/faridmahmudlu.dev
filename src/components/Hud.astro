@@ -1,0 +1,144 @@
+---
+import type { Locale } from '../i18n/config';
+import { t } from '../i18n';
+
+export interface RailStop {
+  id: string;
+  index: string;
+  label: string;
+}
+
+interface Props {
+  locale: Locale;
+  stops: RailStop[];
+}
+const { locale, stops } = Astro.props;
+const d = t(locale);
+---
+
+<div class="hud" data-hud>
+  <nav class="rail" aria-label={d.a11y.sections}>
+    <span class="rail__track" aria-hidden="true"><span class="rail__fill" data-rail-fill></span></span>
+    <ol role="list">
+      {
+        stops.map((s) => (
+          <li>
+            <a href={`#${s.id}`} class="rail__stop" data-rail-stop={s.id}>
+              <span class="rail__dot" aria-hidden="true" />
+              <span class="rail__label mono">
+                <span class="rail__index">{s.index}</span> {s.label}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+</div>
+
+<style>
+  .hud {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+  }
+
+  /* The section rail only appears once the visitor leaves the hero. */
+  .rail {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.6s var(--ease-out),
+      visibility 0s linear 0.6s;
+  }
+
+  :global(.is-past-hero) .rail {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.6s var(--ease-out),
+      visibility 0s;
+  }
+
+  .rail {
+    position: absolute;
+    inset-block: 50% auto;
+    inset-inline-start: calc(var(--frame) + 0.35rem);
+    transform: translateY(-50%);
+    pointer-events: auto;
+  }
+
+  .rail__track {
+    position: absolute;
+    inset-block: 0.55rem;
+    inset-inline-start: 0.3rem;
+    inline-size: 1px;
+    background: var(--line-2);
+  }
+
+  .rail__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--signal);
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+
+  .rail ol {
+    position: relative;
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .rail__stop {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-block-size: 1.15rem;
+  }
+
+  .rail__dot {
+    inline-size: 0.65rem;
+    block-size: 0.65rem;
+    border: 1px solid var(--ink-3);
+    background: var(--bg);
+    transition: background-color 0.3s, border-color 0.3s, transform 0.4s var(--ease-out);
+  }
+
+  .rail__label {
+    padding: 0.2rem 0.45rem;
+    background: rgb(10 11 13 / 0.85);
+    color: var(--ink-2);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-0.4rem);
+    transition: opacity 0.3s, transform 0.4s var(--ease-out);
+  }
+
+  .rail__index {
+    color: var(--ink-3);
+  }
+
+  .rail__stop:hover .rail__label,
+  .rail__stop:focus-visible .rail__label {
+    opacity: 1;
+    transform: none;
+  }
+
+  .rail__stop.is-passed .rail__dot {
+    border-color: var(--signal);
+  }
+
+  .rail__stop.is-active .rail__dot {
+    background: var(--signal);
+    border-color: var(--signal);
+    transform: rotate(45deg);
+  }
+
+  @media (max-width: 1099px), (max-height: 620px) {
+    .rail {
+      display: none;
+    }
+  }
+</style>

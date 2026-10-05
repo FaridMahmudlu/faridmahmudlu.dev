@@ -1,0 +1,33 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { LOCALES, type Locale } from '../i18n/config';
+import { allPages, pathFor, type PageRef } from '../i18n/routes';
+import HomePage from '../components/pages/HomePage.astro';
+import WorkPage from '../components/pages/WorkPage.astro';
+import LegalPage from '../components/pages/LegalPage.astro';
+
+/**
+ * Every HTML page of the site is generated from the route table in
+ * src/i18n/routes.ts. One file, one source of truth for URLs.
+ */
+export const getStaticPaths = (() =>
+  allPages().flatMap((page) =>
+    LOCALES.map((locale) => {
+      const path = pathFor(page, locale);
+      return {
+        params: { path: path === '/' ? undefined : path.slice(1, -1) },
+        props: { page, locale },
+      };
+    }),
+  )) satisfies GetStaticPaths;
+
+interface Props {
+  page: PageRef;
+  locale: Locale;
+}
+const { page, locale } = Astro.props;
+---
+
+{page.type === 'home' && <HomePage locale={locale} />}
+{page.type === 'work' && <WorkPage locale={locale} slug={page.slug} />}
+{page.type === 'legal' && <LegalPage locale={locale} id={page.id} />}

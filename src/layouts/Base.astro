@@ -1,0 +1,202 @@
+---
+import '../styles/global.css';
+import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+import archivoLatinExt from '@fontsource-variable/archivo/files/archivo-latin-ext-wdth-normal.woff2?url';
+import { LOCALES, LOCALE_META, DEFAULT_LOCALE, type Locale } from '../i18n/config';
+import { t } from '../i18n';
+import { alternatesFor, pathFor, type PageRef } from '../i18n/routes';
+import { abs, ogImageFor, serializeJsonLd } from '../lib/seo';
+import { profile } from '../data/profile';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MotionToggle from '../components/MotionToggle.astro';
+
+interface Props {
+  locale: Locale;
+  page: PageRef;
+  title: string;
+  description: string;
+  jsonLd: Record<string, unknown>;
+  ogType?: 'website' | 'profile' | 'article';
+  /** Particle formation to show behind the page; omit for no WebGL. */
+  signal?: string;
+  bodyClass?: string;
+  /** Error pages: no canonical, no alternates, not indexable. */
+  noindex?: boolean;
+}
+
+const { locale, page, title, description, jsonLd, ogType = 'website', signal, bodyClass, noindex = false } = Astro.props;
+const d = t(locale);
+const meta = LOCALE_META[locale];
+const canonical = abs(pathFor(page, locale));
+const alternates = alternatesFor(page);
+const ogImage = ogImageFor(page, locale);
+---
+
+<!doctype html>
+<html lang={meta.tag} dir="ltr" data-locale={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {
+      noindex ? (
+        <meta name="robots" content="noindex, follow" />
+      ) : (
+        <>
+          <link rel="canonical" href={canonical} />
+          {alternates.map((alt) => (
+            <link rel="alternate" hreflang={LOCALE_META[alt.locale].tag} href={abs(alt.path)} />
+          ))}
+          <link rel="alternate" hreflang="x-default" href={abs(pathFor(page, DEFAULT_LOCALE))} />
+          <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        </>
+      )
+    }
+    <meta name="author" content={profile.name} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0b0d" />
+    <meta name="format-detection" content="telephone=no, email=no, address=no" />
+
+    <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
+    {meta.needsLatinExt && <link rel="preload" href={archivoLatinExt} as="font" type="font/woff2" crossorigin />}
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="author" href="/humans.txt" />
+    <link rel="me" href={profile.links.github} />
+    <link rel="me" href={profile.links.linkedin} />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={d.meta.siteName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:locale" content={meta.og} />
+    {LOCALES.filter((l) => l !== locale).map((l) => <meta property="og:locale:alternate" content={LOCALE_META[l].og} />)}
+    {
+      ogType === 'profile' && (
+        <>
+          <meta property="profile:first_name" content={profile.givenName} />
+          <meta property="profile:last_name" content={profile.familyName} />
+          <meta property="profile:username" content={profile.githubHandle} />
+        </>
+      )
+    }
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={title} />
+
+    <script type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />
+  </head>
+  <body class={bodyClass} data-page={page.type} data-signal={signal}>
+    <a class="skip-link" href="#main">{d.a11y.skip}</a>
+    <div id="top" class="top-anchor" aria-hidden="true"></div>
+    {signal && <canvas class="signal-canvas" data-signal-canvas aria-hidden="true" />}
+    <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+    <Header locale={locale} page={page} />
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <Footer locale={locale} />
+
+    <slot name="after" />
+    {signal && <MotionToggle locale={locale} />}
+
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .top-anchor {
+    position: absolute;
+    inset: 0 0 auto;
+    block-size: 1px;
+  }
+
+  #main {
+    position: relative;
+    z-index: 1;
+    outline: none;
+  }
+
+  .signal-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    inline-size: 100%;
+    block-size: 100vh;
+    block-size: 100lvh;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.6s var(--ease-out);
+  }
+
+  .signal-canvas.is-live {
+    opacity: 1;
+  }
+
+  /* Instrument-panel crop marks framing the viewport */
+  .frame {
+    position: fixed;
+    inset: var(--frame);
+    z-index: 40;
+    pointer-events: none;
+  }
+
+  .frame i {
+    position: absolute;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    border-color: var(--line-2);
+    border-style: solid;
+    border-width: 0;
+  }
+
+  .frame i:nth-child(1) {
+    inset: 0 auto auto 0;
+    border-block-start-width: 1px;
+    border-inline-start-width: 1px;
+  }
+
+  .frame i:nth-child(2) {
+    inset: 0 0 auto auto;
+    border-block-start-width: 1px;
+    border-inline-end-width: 1px;
+  }
+
+  .frame i:nth-child(3) {
+    inset: auto auto 0 0;
+    border-block-end-width: 1px;
+    border-inline-start-width: 1px;
+  }
+
+  .frame i:nth-child(4) {
+    inset: auto 0 0 auto;
+    border-block-end-width: 1px;
+    border-inline-end-width: 1px;
+  }
+
+  .motion-off *,
+  .motion-off *::before,
+  .motion-off *::after {
+    animation-play-state: paused !important;
+  }
+</style>

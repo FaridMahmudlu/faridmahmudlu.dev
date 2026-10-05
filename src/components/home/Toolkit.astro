@@ -1,0 +1,105 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n';
+import { skills, type SkillGroup } from '../../data/profile';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+const groups = Object.keys(skills) as SkillGroup[];
+---
+
+<section class="toolkit" id="toolkit" data-formation="field" data-chapter="STK" data-chapter-label={d.toolkit.kicker} aria-labelledby="toolkit-title">
+  <div class="wrap">
+    <header class="toolkit__head">
+      <p class="kicker mono" data-reveal>{d.toolkit.kicker}</p>
+      <h2 id="toolkit-title" class="h2" data-split>{d.toolkit.title}</h2>
+    </header>
+    <div class="toolkit__grid">
+      {
+        groups.map((g, i) => (
+          <section class="toolkit__group" data-reveal data-d={String(i * 90)} aria-labelledby={`tk-${g}`}>
+            <h3 id={`tk-${g}`} class="mono">
+              <span aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {d.toolkit.groups[g]}
+            </h3>
+            <ul role="list">
+              {skills[g].map((s) => (
+                <li>{s}</li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .toolkit {
+    position: relative;
+    padding-block: calc(var(--section-y) * 0.6) var(--section-y);
+  }
+
+  .toolkit__head {
+    display: grid;
+    gap: clamp(1.25rem, 2.4vw, 2rem);
+    margin-block-end: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .toolkit__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .toolkit__group {
+    padding: 1.25rem 1.25rem 1.5rem 0;
+  }
+
+  .toolkit__group + .toolkit__group {
+    padding-inline-start: 1.25rem;
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .toolkit__group h3 {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--ink-2);
+    font-weight: 400;
+    margin-block-end: 1.25rem;
+  }
+
+  .toolkit__group h3 span {
+    color: var(--signal);
+  }
+
+  .toolkit__group ul {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .toolkit__group li {
+    font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.3rem);
+    font-stretch: 106%;
+    font-weight: 450;
+    letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 899px) {
+    .toolkit__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .toolkit__group:nth-child(3) {
+      padding-inline-start: 0;
+      border-inline-start: 0;
+    }
+
+    .toolkit__group:nth-child(n + 3) {
+      border-block-start: 1px solid var(--line);
+    }
+  }
+</style>

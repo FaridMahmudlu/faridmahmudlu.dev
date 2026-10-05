@@ -1,0 +1,88 @@
+---
+import { LOCALES, LOCALE_META } from '../i18n/config';
+import { t } from '../i18n';
+import { homePath } from '../i18n/routes';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+
+const d = t('en');
+---
+
+<Base
+  locale="en"
+  page={{ type: 'home' }}
+  title={`404 — ${d.notFound.title}${d.meta.titleSuffix}`}
+  description={d.notFound.body}
+  jsonLd={{ '@context': 'https://schema.org', '@type': 'WebPage', name: '404' }}
+  signal="point"
+  noindex
+>
+  <section class="nf wrap" data-formation="point" aria-labelledby="nf-title">
+    <p class="mono nf__code" aria-hidden="true">ERR 404 · NO ROUTE</p>
+    <h1 id="nf-title" class="nf__title">{d.notFound.title}</h1>
+    <ul class="nf__list" role="list">
+      {
+        LOCALES.map((l) => {
+          const dict = t(l);
+          return (
+            <li lang={LOCALE_META[l].tag}>
+              <p class="nf__body">{l === 'en' ? dict.notFound.body : `${dict.notFound.title} ${dict.notFound.body}`}</p>
+              <a class="link mono" href={homePath(l)} hreflang={LOCALE_META[l].tag}>
+                {dict.notFound.home}
+                <Icon name="arrow-right" />
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    min-block-size: 100svh;
+    display: grid;
+    align-content: center;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding-block: calc(var(--header-h) + 3rem) 4rem;
+  }
+
+  .nf__code {
+    color: var(--signal);
+  }
+
+  .nf__title {
+    font-size: clamp(3.5rem, 1rem + 10vw, 11rem);
+    font-stretch: 112%;
+    font-weight: 620;
+    letter-spacing: -0.05em;
+    line-height: 0.88;
+  }
+
+  .nf__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1.5rem;
+    max-inline-size: 64rem;
+    border-block-start: 1px solid var(--line-2);
+    padding-block-start: 1.5rem;
+  }
+
+  .nf__list li {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+  }
+
+  .nf__body {
+    color: var(--ink-2);
+  }
+
+  .nf__list a {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    inline-size: fit-content;
+  }
+</style>

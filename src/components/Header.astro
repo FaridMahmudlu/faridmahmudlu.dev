@@ -1,0 +1,275 @@
+---
+import type { Locale } from '../i18n/config';
+import { t } from '../i18n';
+import { homePath, type PageRef } from '../i18n/routes';
+import LangSwitch from './LangSwitch.astro';
+
+interface Props {
+  locale: Locale;
+  page: PageRef;
+}
+const { locale, page } = Astro.props;
+const d = t(locale);
+const links = [
+  { id: 'process', label: d.nav.process },
+  { id: 'work', label: d.nav.work },
+  { id: 'log', label: d.nav.log },
+  { id: 'contact', label: d.nav.contact },
+] as const;
+---
+
+<header class="site-header" data-header>
+  <a class="brand" href={homePath(locale)} aria-label={d.a11y.home}>
+    <span class="brand__dot" aria-hidden="true"></span>
+    <span class="brand__name mono">Farid Mahmudlu</span>
+  </a>
+
+  <nav class="site-nav" aria-label={d.a11y.mainNav}>
+    <ol role="list">
+      {
+        links.map((link, i) => (
+          <li>
+            <a class="mono" href={homePath(locale, link.id)}>
+              <span class="site-nav__i" aria-hidden="true">
+                0{i + 1}
+              </span>
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <LangSwitch locale={locale} page={page} class="site-header__lang" />
+
+  <button class="menu-btn mono" type="button" popovertarget="site-menu" aria-haspopup="dialog">
+    <span>{d.a11y.menu}</span>
+    <span class="menu-btn__icon" aria-hidden="true"></span>
+  </button>
+
+  <div id="site-menu" class="menu" popover role="dialog" aria-label={d.a11y.mainNav} data-menu>
+    <div class="menu__top">
+      <span class="brand__name mono">Farid Mahmudlu</span>
+      <button class="menu-close mono" type="button" popovertarget="site-menu" popovertargetaction="hide">
+        {d.a11y.close}
+      </button>
+    </div>
+    <nav aria-label={d.a11y.mainNav}>
+      <ol role="list" class="menu__list">
+        {
+          links.map((link, i) => (
+            <li>
+              <a href={homePath(locale, link.id)} data-menu-link>
+                <span class="mono" aria-hidden="true">
+                  0{i + 1}
+                </span>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+    <LangSwitch locale={locale} page={page} class="menu__lang" />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 3rem);
+    block-size: var(--header-h);
+    padding-inline: var(--gutter);
+    transition: background-color 0.4s;
+  }
+
+  .site-header::after {
+    content: '';
+    position: absolute;
+    inset: auto var(--gutter) 0;
+    block-size: 1px;
+    background: var(--line);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.8s var(--ease-out);
+  }
+
+  /* Opaque rather than backdrop-blurred: blurring a live WebGL canvas costs a full-width pass every frame. */
+  :global(.is-scrolled) .site-header {
+    background-color: rgb(10 11 13 / 0.92);
+  }
+
+  :global(.is-scrolled) .site-header::after {
+    transform: none;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-inline-end: auto;
+    min-block-size: 2.75rem;
+  }
+
+  .brand__dot {
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    background: var(--signal);
+    box-shadow: 0 0 0 0 rgb(255 90 31 / 0.5);
+    animation: beacon 2.8s var(--ease-out) infinite;
+  }
+
+  @keyframes beacon {
+    0% {
+      box-shadow: 0 0 0 0 rgb(255 90 31 / 0.55);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 0.7rem rgb(255 90 31 / 0);
+    }
+  }
+
+  .brand__name {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .site-nav ol {
+    display: flex;
+    gap: clamp(1rem, 2.4vw, 2.5rem);
+  }
+
+  .site-nav a {
+    position: relative;
+    display: inline-flex;
+    gap: 0.5em;
+    padding-block: 0.75rem;
+    color: var(--ink-2);
+    transition: color 0.2s;
+  }
+
+  .site-nav a::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0.45rem;
+    block-size: 1px;
+    background: var(--signal);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .site-nav a:hover {
+    color: var(--ink);
+  }
+
+  .site-nav a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .site-nav__i {
+    color: var(--ink-3);
+  }
+
+  .menu-btn {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    min-block-size: 2.75rem;
+    padding-inline: 0.25rem;
+  }
+
+  .menu-btn__icon {
+    position: relative;
+    inline-size: 1.25rem;
+    block-size: 0.5rem;
+    border-block: 1px solid currentColor;
+  }
+
+  .menu {
+    inset: 0;
+    inline-size: 100%;
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    margin: 0;
+    padding: 0 var(--gutter) calc(var(--gutter) + env(safe-area-inset-bottom));
+    border: 0;
+    background: var(--bg);
+    color: var(--ink);
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .menu:popover-open {
+    display: flex;
+  }
+
+  .menu::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+
+  .menu__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    block-size: var(--header-h);
+  }
+
+  .menu-close {
+    min-block-size: 2.75rem;
+    color: var(--ink-2);
+  }
+
+  .menu__list {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .menu__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.6rem;
+    border-block-end: 1px solid var(--line);
+    font-size: clamp(2.25rem, 9vw, 3.5rem);
+    font-stretch: 112%;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .menu__list a .mono {
+    color: var(--signal);
+  }
+
+  @media (max-width: 899px) {
+    .site-nav,
+    :global(.site-header__lang) {
+      display: none;
+    }
+
+    .menu-btn {
+      display: inline-flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu:popover-open {
+      animation: menu-in 0.5s var(--ease-out);
+    }
+
+    @keyframes menu-in {
+      from {
+        opacity: 0;
+        transform: translateY(-1rem);
+      }
+    }
+  }
+</style>

@@ -1,0 +1,148 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+<section class="faq" id="faq" data-formation="field" data-chapter="FAQ" data-chapter-label={d.faq.kicker} aria-labelledby="faq-title">
+  <div class="wrap faq__inner">
+    <header class="faq__head">
+      <p class="kicker mono" data-reveal>{d.faq.kicker}</p>
+      <h2 id="faq-title" class="h2" data-split>{d.faq.title}</h2>
+    </header>
+    <div class="faq__list">
+      {
+        d.faq.items.map((item, i) => (
+          <details class="faq__item" data-reveal data-d={String(i * 60)} open={i === 0}>
+            <summary>
+              <span class="faq__n mono" aria-hidden="true">
+                Q{String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="faq__q">{item.q}</h3>
+              <span class="faq__toggle" aria-hidden="true" />
+            </summary>
+            <p class="faq__a">{item.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq {
+    position: relative;
+    padding-block: var(--section-y);
+  }
+
+  .faq__inner {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(0.75rem, 0.4rem + 1.2vw, 1.5rem);
+    row-gap: 2.5rem;
+  }
+
+  .faq__head {
+    grid-column: 1 / span 4;
+    display: grid;
+    gap: clamp(1.25rem, 2.4vw, 2rem);
+    align-content: start;
+  }
+
+  .faq__list {
+    grid-column: 6 / -1;
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .faq__item {
+    border-block-end: 1px solid var(--line);
+  }
+
+  .faq__item summary {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr 1.25rem;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1.35rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__n {
+    color: var(--ink-3);
+  }
+
+  .faq__q {
+    font-size: var(--fs-h3);
+    font-stretch: 106%;
+    font-weight: 520;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    transition: color 0.2s;
+  }
+
+  .faq__item summary:hover .faq__q {
+    color: var(--signal);
+  }
+
+  .faq__toggle {
+    position: relative;
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    align-self: center;
+  }
+
+  .faq__toggle::before,
+  .faq__toggle::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto;
+    block-size: 1px;
+    background: currentColor;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .faq__toggle::after {
+    transform: rotate(90deg);
+  }
+
+  .faq__item[open] .faq__toggle::after {
+    transform: rotate(0deg);
+  }
+
+  .faq__a {
+    padding: 0 2.25rem 1.6rem 4.5rem;
+    color: var(--ink-2);
+    max-inline-size: 64ch;
+  }
+
+  @media (max-width: 1099px) {
+    .faq__head,
+    .faq__list {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .faq__item summary {
+      grid-template-columns: 1fr 1.25rem;
+    }
+
+    .faq__n {
+      display: none;
+    }
+
+    .faq__a {
+      padding-inline: 0 1.5rem;
+    }
+  }
+</style>
