@@ -10,6 +10,8 @@ const out = (name) => fileURLToPath(new URL(`../public/${name}`, import.meta.url
 const png = (size, density = 72 * (size / 64)) => sharp(svg, { density }).resize(size, size).png({ compressionLevel: 9 });
 
 await png(180).flatten({ background: '#0a0b0d' }).toFile(out('apple-touch-icon.png'));
+// Google Search shows favicons from sizes that are multiples of 48 px.
+await png(96).toFile(out('favicon-96x96.png'));
 await png(192).toFile(out('icon-192.png'));
 await png(512).toFile(out('icon-512.png'));
 
@@ -20,15 +22,16 @@ await sharp({ create: { width: 512, height: 512, channels: 4, background: '#0a0b
   .png({ compressionLevel: 9 })
   .toFile(out('icon-maskable-512.png'));
 
-// favicon.ico containing a 32x32 and a 16x16 PNG (ICO allows embedded PNG data).
-const images = await Promise.all([32, 16].map((s) => png(s).toBuffer()));
+// favicon.ico containing 48x48, 32x32 and 16x16 PNGs (ICO allows embedded PNG data).
+const ICO_SIZES = [48, 32, 16];
+const images = await Promise.all(ICO_SIZES.map((s) => png(s).toBuffer()));
 const header = Buffer.alloc(6);
 header.writeUInt16LE(0, 0);
 header.writeUInt16LE(1, 2);
 header.writeUInt16LE(images.length, 4);
 let offset = 6 + 16 * images.length;
 const entries = images.map((img, i) => {
-  const size = [32, 16][i];
+  const size = ICO_SIZES[i];
   const e = Buffer.alloc(16);
   e.writeUInt8(size, 0);
   e.writeUInt8(size, 1);

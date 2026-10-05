@@ -125,7 +125,7 @@ if (!/frame-ancestors 'none'/.test(csp) || !/object-src 'none'/.test(csp)) fail(
 const securityTxt = readFileSync(join(DIST, '.well-known', 'security.txt'), 'utf8');
 const expires = securityTxt.match(/^Expires: (.+)$/m)?.[1];
 if (!expires || new Date(expires) <= new Date()) fail('security.txt', 'Expires missing or in the past');
-for (const f of ['robots.txt', 'llms.txt', 'llms-full.txt', 'manifest.webmanifest', 'favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'humans.txt', 'cv/farid-mahmudlu-cv.pdf']) {
+for (const f of ['robots.txt', 'llms.txt', 'llms-full.txt', 'manifest.webmanifest', 'favicon.ico', 'favicon.svg', 'favicon-96x96.png', 'icon-192.png', 'apple-touch-icon.png', 'humans.txt', 'cv/farid-mahmudlu-cv.pdf']) {
   if (!existsSync(join(DIST, f))) fail(f, 'missing');
 }
 
